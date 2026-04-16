@@ -5,13 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Waste Dashboard Analytics</title>
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
     <!-- External CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="/static/dashboard.css">
     
     <!-- External JS -->
-    <script defer src="{{ url_for('static', filename='dashboard.js') }}"></script>
+    <script defer src="/static/dashboard.js"></script>
 </head>
 <body>
     <!-- Background Particles Layer -->
@@ -25,9 +27,9 @@
         <aside class="sidebar" id="sidebar">
             <div class="logo">♻️ SmartWaste</div>
             <nav class="sidebar-nav">
-                <a href="{{ url_for('home') }}" class="nav-item">🏠 Home</a>
-                <a href="{{ url_for('submit') }}" class="nav-item">♻️ Submit Waste</a>
-                <a href="{{ url_for('dashboard') }}" class="nav-item active">📊 Analytics</a>
+                <a href="/" class="nav-item">Home</a>
+                <a href="/submit" class="nav-item">Submit Waste</a>
+                <a href="/dashboard" class="nav-item active">Analytics</a>
             </nav>
         </aside>
 
@@ -41,13 +43,12 @@
                     <p>Real-time ML classification metrics</p>
                 </div>
                 <div class="topbar-actions">
-                    <a href="{{ url_for('download_data') }}" class="btn-new" style="background: rgba(255, 255, 255, 0.4); border: 1px solid rgba(0,0,0,0.1); color: var(--dark); text-shadow: none;">⬇️ Download CSV</a>
                     
-                    <form action="{{ url_for('clear_data') }}" method="POST" style="margin: 0;">
-                        <button type="submit" class="btn-new" style="background: rgba(244, 67, 54, 0.15); border: 1px solid rgba(244, 67, 54, 0.3); color: #c62828; cursor: pointer; text-shadow: none; font-family: 'Inter';" onclick="return confirm('Are you sure you want to clear all data? This cannot be undone.');">🗑️ Clear Data</button>
+                    <form action="/clear" method="POST" style="margin: 0;">
+                        <button type="submit" class="btn-new" style="background: rgba(244, 67, 54, 0.15); border: 1px solid rgba(244, 67, 54, 0.3); color: #c62828; cursor: pointer; text-shadow: none; font-family: 'Roboto', sans-serif;" onclick="return confirm('Are you sure you want to clear all data? This cannot be undone.');">🗑️ Clear Data</button>
                     </form>
                     
-                    <a href="{{ url_for('submit') }}" class="btn-new">＋ Log New Item</a>
+                    <a href="/submit" class="btn-new">＋ Log New Item</a>
                 </div>
             </header>
 
@@ -110,7 +111,7 @@
                 {% if not data %}
                 <div class="empty-state">
                     <p>No waste data has been logged yet.</p>
-                    <a href="{{ url_for('submit') }}">Log your first item</a>
+                    <a href="/submit">Log your first item</a>
                 </div>
                 {% endif %}
             </div>

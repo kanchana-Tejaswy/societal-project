@@ -4,63 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Waste | Analyze</title>
-    
-    <!-- Clean External Fonts -->
+
+    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Native Static Connections (Allows VSCode Preview & Flask) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-    <script defer src="{{ url_for('static', filename='index.js') }}"></script>
+
+    <!-- Relative Static Paths for direct HTML execution -->
+    <link rel="stylesheet" href="/static/index.css">
+    <script defer src="/static/index.js"></script>
 </head>
+
 <body class="landing-page">
-    
-    <!-- Application Navigation Bar -->
+
+    <!-- NAVBAR -->
     <nav class="navbar">
-        <a href="{{ url_for('home') }}" class="nav-brand">
+        <a href="/" class="nav-brand">
             <span class="icon">♻️</span> SmartWaste
         </a>
+
         <div class="nav-links">
-            <a href="{{ url_for('home') }}" class="nav-item">Home</a>
-            <a href="{{ url_for('submit') }}" class="nav-item active">Log Waste</a>
-            <a href="{{ url_for('dashboard') }}" class="nav-item">Dashboard</a>
+            <a href="/" class="nav-item">Home</a>
+            <a href="/submit" class="nav-item active">Submit Waste</a>
+            <a href="/dashboard" class="nav-item">Analytics</a>
         </div>
+
         <button class="mobile-menu-btn" id="mobileMenuBtn">
             <span></span><span></span><span></span>
         </button>
     </nav>
 
-    <!-- Mobile Navigation Drawer -->
+    <!-- MOBILE MENU -->
     <div class="mobile-drawer" id="mobileDrawer">
-        <a href="{{ url_for('home') }}" class="nav-item">Home</a>
-        <a href="{{ url_for('submit') }}" class="nav-item active">Log Waste</a>
-        <a href="{{ url_for('dashboard') }}" class="nav-item">Dashboard</a>
+        <a href="/" class="nav-item">Home</a>
+        <a href="/submit" class="nav-item active">Submit Waste</a>
+        <a href="/dashboard" class="nav-item">Analytics</a>
     </div>
 
-    <!-- Strictly Submit Form Logic inside Index -->
-    <section class="submit-section" style="padding: 120px 20px 100px; display: flex; justify-content: center; position: relative; min-height: 100vh; align-items: center;">
-        <form action="{{ url_for('add_waste') }}" method="POST" enctype="multipart/form-data" id="wasteForm" class="fade-in delay-1">
-            <h2 style="font-size: 2rem; color: var(--primary); font-weight: 700; margin-bottom: 10px; text-align: center;">Analyze Waste</h2>
-            <p style="color: var(--gray); font-weight: 500; font-size: 1rem; margin-bottom: 25px; text-align: center;">Input waste details to run AI classification.</p>
-            
+    <!-- FORM SECTION -->
+    <section class="submit-section" style="padding: 120px 20px; display:flex; justify-content:center; align-items:center; min-height:100vh;">
+
+        <form action="/add" method="POST" enctype="multipart/form-data" id="wasteForm">
+
+            <h2>Analyze Waste</h2>
+            <p>Upload waste details for AI classification</p>
+
+            <!-- Plastic Type -->
             <label>Plastic Type</label>
-            <select name="plastic_type" id="plastic_type" required>
-                <option value="" disabled selected>Select Plastic Type...</option>
-                <option value="PET">PET (Bottles, Containers)</option>
-                <option value="HDPE">HDPE (Milk Jugs, Detergent)</option>
-                <option value="PVC">PVC (Pipes, Medical Tubes)</option>
+            <select name="plastic_type" required>
+                <option value="" disabled selected>Select Type</option>
+                <option value="PET">PET</option>
+                <option value="HDPE">HDPE</option>
+                <option value="PVC">PVC</option>
             </select>
-            
-            <label>Quantity Metric</label>
-            <input type="number" name="quantity" id="quantity" placeholder="Units / Pieces" required min="1">
-            
-            <label>Upload Material Image</label>
-            <input type="file" name="image" id="image" required accept="image/*" style="border: 2px dashed rgba(67, 160, 71, 0.4); background: transparent;">
-            
-            <!-- Submit Action -->
-            <button type="submit" class="btn-submit ripple-btn" id="submitBtn">
-                <span class="btn-text">Run Intelligence ♻️</span>
+
+            <!-- Quantity -->
+            <label>Quantity</label>
+            <input type="number" name="quantity" min="1" required placeholder="Enter quantity">
+
+            <!-- SINGLE IMAGE UPLOAD -->
+            <label>Upload Image</label>
+            <input type="file" name="image" accept="image/*" required>
+
+            <!-- SUBMIT -->
+            <button type="submit" class="btn-submit">
+                Run AI Analysis ♻️
             </button>
+
         </form>
+
     </section>
 
 </body>

@@ -1,56 +1,97 @@
 import os
 
+# ----------------------------------------------------
+# 1. CONFIGURATION
+# ----------------------------------------------------
 DATASET_DIR = "dataset/train"
 CLASSES = ["glass", "metal", "paper", "plastic"]
-MINIMUM_SAMPLES = 100
+MIN_SAMPLES = 100
+IMBALANCE_THRESHOLD = 0.3
 
+# ----------------------------------------------------
+# 2. DATASET VALIDATION
+# ----------------------------------------------------
 def validate_dataset():
     """
-    MLOps verification script.
-    Checks dataset integrity and warns against severe class imbalances securely.
+    Validates dataset structure and class distribution
+    for CNN training readiness.
     """
-    print("--- DATASET VALIDATION PIPELINE ---")
-    
+
+    print("\n==============================")
+    print(" DATASET VALIDATION REPORT")
+    print("==============================\n")
+
+    # Check dataset root
     if not os.path.exists(DATASET_DIR):
-        print(f"❌ CRITICAL ERROR: Dataset directory '{DATASET_DIR}' completely missing.")
-        print(f"Please formulate the explicit tree tracking exactly: {CLASSES}")
+        print(f"ERROR: Dataset folder not found -> {DATASET_DIR}")
+        print("Expected structure:")
+        print("dataset/train/glass")
+        print("dataset/train/metal")
+        print("dataset/train/paper")
+        print("dataset/train/plastic\n")
         return False
 
     counts = {}
-    valid = True
 
-    # Check structural boundaries
+    # ----------------------------------------------------
+    # 3. COUNT FILES PER CLASS
+    # ----------------------------------------------------
     for cls in CLASSES:
-        cls_path = os.path.join(DATASET_DIR, cls)
-        if not os.path.exists(cls_path):
-            print(f"❌ MISSING FOLDER: Expected structured directory -> {cls_path}")
-            valid = False
+        class_path = os.path.join(DATASET_DIR, cls)
+
+        if not os.path.exists(class_path):
+            print(f"WARNING: Missing folder -> {class_path}")
             counts[cls] = 0
             continue
-            
-        # Count explicit valid file types dynamically checking safe constraints
-        valid_files = [f for f in os.listdir(cls_path) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
-        counts[cls] = len(valid_files)
 
-    print("\n--- CLASS DISTRIBUTION ---")
+        files = [
+            f for f in os.listdir(class_path)
+            if f.lower().endswith((".png", ".jpg", ".jpeg"))
+        ]
+
+        counts[cls] = len(files)
+
+    # ----------------------------------------------------
+    # 4. DISPLAY DISTRIBUTION
+    # ----------------------------------------------------
+    print("CLASS DISTRIBUTION:\n")
+
     for cls, count in counts.items():
-        status = "✅ PASS" if count >= MINIMUM_SAMPLES else f"⚠️ WARNING (Needs {MINIMUM_SAMPLES})"
-        print(f"[{cls}]: {count} images -> {status}")
+        status = "OK" if count >= MIN_SAMPLES else "LOW DATA"
+        print(f"{cls:<10} : {count} images -> {status}")
 
-    # Check Imbalance cleanly mathematically natively
+    # ----------------------------------------------------
+    # 5. IMBALANCE CHECK
+    # ----------------------------------------------------
     max_count = max(counts.values()) if counts else 0
     min_count = min(counts.values()) if counts else 0
-    
-    if max_count > 0 and (min_count / max_count) < 0.3:
-        print("\n❌ SEVERE IMBALANCE: Standard minority classes exist heavily skewed.")
-        print("Neural Networks dynamically bias cleanly mapping explicitly to the majority class natively. Equalize parameters.")
-        valid = False
 
-    print("\n--- FINAL STATUS ---")
+    valid = True
+
+    if max_count > 0:
+        imbalance_ratio = min_count / max_count
+
+        if imbalance_ratio < IMBALANCE_THRESHOLD:
+            print("\nWARNING: Dataset imbalance detected!")
+            print(f"Imbalance Ratio: {imbalance_ratio:.2f}")
+            print("Recommendation: Balance dataset for better CNN performance.")
+            valid = False
+
+    # ----------------------------------------------------
+    # 6. FINAL STATUS
+    # ----------------------------------------------------
+    print("\n==============================")
     if valid:
-        print("MOCK VALIDATION PIPELINE SECURE. Proceed cleanly executing `train_cnn.py`.")
+        print("DATASET STATUS: READY FOR TRAINING")
     else:
-        print("SYSTEM ABORT: Target dataset violates standard strict MLOps architecture identically tracking safely.")
+        print("DATASET STATUS: NEEDS IMPROVEMENT")
+    print("==============================\n")
 
+    return valid
+
+
+# ----------------------------------------------------
+# 7. RUN SCRIPT
+# ----------------------------------------------------
 if __name__ == "__main__":
     validate_dataset()

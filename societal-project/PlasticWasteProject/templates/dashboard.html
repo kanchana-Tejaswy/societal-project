@@ -10,10 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
     <!-- External CSS -->
-    <link rel="stylesheet" href="/static/dashboard.css">
+    <link rel="stylesheet" href="../static/dashboard.css">
     
     <!-- External JS -->
-    <script defer src="/static/dashboard.js"></script>
+    <script defer src="../static/dashboard.js"></script>
 </head>
 <body>
     <!-- Background Particles Layer -->
@@ -27,9 +27,9 @@
         <aside class="sidebar" id="sidebar">
             <div class="logo">♻️ SmartWaste</div>
             <nav class="sidebar-nav">
-                <a href="/" class="nav-item">Home</a>
-                <a href="/submit" class="nav-item">Submit Waste</a>
-                <a href="/dashboard" class="nav-item active">Analytics</a>
+                <a href="landing.html" class="nav-item">Home</a>
+                <a href="index.html" class="nav-item">Submit Waste</a>
+                <a href="dashboard.html" class="nav-item active">Analytics</a>
             </nav>
         </aside>
 
@@ -44,11 +44,9 @@
                 </div>
                 <div class="topbar-actions">
                     
-                    <form action="/clear" method="POST" style="margin: 0;">
-                        <button type="submit" class="btn-new" style="background: rgba(244, 67, 54, 0.15); border: 1px solid rgba(244, 67, 54, 0.3); color: #c62828; cursor: pointer; text-shadow: none; font-family: 'Roboto', sans-serif;" onclick="return confirm('Are you sure you want to clear all data? This cannot be undone.');">🗑️ Clear Data</button>
-                    </form>
+                    <button id="clearData" type="button" class="btn-new" style="background: rgba(244, 67, 54, 0.15); border: 1px solid rgba(244, 67, 54, 0.3); color: #c62828; cursor: pointer; text-shadow: none; font-family: 'Roboto', sans-serif;">🗑️ Clear Data</button>
                     
-                    <a href="/submit" class="btn-new">＋ Log New Item</a>
+                    <a href="index.html" class="btn-new">＋ Log New Item</a>
                 </div>
             </header>
 
@@ -93,27 +91,14 @@
                                 <th>AI Status</th>
                             </tr>
                         </thead>
-                        <tbody id="tableBody">
-                            {% for row in data %}
-                            <tr class="data-row">
-                                <td data-label="Log ID">#{{ row[0] }}</td>
-                                <td data-label="Category" class="col-category">
-                                    <span class="type-pill">{{ row[1] }}</span>
-                                </td>
-                                <td data-label="Quantity">{{ row[2] }} units</td>
-                                <td data-label="AI Status" class="col-recyclable">{{ row[3] }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
+                        <tbody id="tableBody"></tbody>
                     </table>
                 </div>
 
-                {% if not data %}
-                <div class="empty-state">
+                <div class="empty-state" id="emptyState">
                     <p>No waste data has been logged yet.</p>
-                    <a href="/submit">Log your first item</a>
+                    <a href="index.html">Log your first item</a>
                 </div>
-                {% endif %}
             </div>
 
         </main>

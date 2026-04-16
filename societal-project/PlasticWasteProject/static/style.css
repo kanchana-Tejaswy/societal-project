@@ -1,0 +1,5 @@
+/* This file has been merged! 
+   All primary styling rules from style.css and index.css have been fully consolidated into static/index.css
+   This empty stub ensures we do not have 404 dead links breaking older parts of the template.
+*/
+@import url('/static/index.css');

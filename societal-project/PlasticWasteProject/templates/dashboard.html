@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waste Dashboard Analytics</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    
+    <!-- External JS -->
+    <script defer src="{{ url_for('static', filename='dashboard.js') }}"></script>
+</head>
+<body>
+    <!-- Background Particles Layer -->
+    <div id="particles"></div>
+
+    <!-- Toggle Btn for Mobile Sidebar -->
+    <button class="mobile-menu-btn" id="menuToggle">☰</button>
+
+    <div class="dashboard-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">♻️ SmartWaste</div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('home') }}" class="nav-item">🏠 Home</a>
+                <a href="{{ url_for('submit') }}" class="nav-item">♻️ Submit Waste</a>
+                <a href="{{ url_for('dashboard') }}" class="nav-item active">📊 Analytics</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Dashboard Header -->
+            <header class="topbar fade-up">
+                <div>
+                    <h1>Waste Analytics</h1>
+                    <p>Real-time ML classification metrics</p>
+                </div>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('download_data') }}" class="btn-new" style="background: rgba(255, 255, 255, 0.4); border: 1px solid rgba(0,0,0,0.1); color: var(--dark); text-shadow: none;">⬇️ Download CSV</a>
+                    
+                    <form action="{{ url_for('clear_data') }}" method="POST" style="margin: 0;">
+                        <button type="submit" class="btn-new" style="background: rgba(244, 67, 54, 0.15); border: 1px solid rgba(244, 67, 54, 0.3); color: #c62828; cursor: pointer; text-shadow: none; font-family: 'Inter';" onclick="return confirm('Are you sure you want to clear all data? This cannot be undone.');">🗑️ Clear Data</button>
+                    </form>
+                    
+                    <a href="{{ url_for('submit') }}" class="btn-new">＋ Log New Item</a>
+                </div>
+            </header>
+
+            <!-- Dashboard KPIs / Stat Cards -->
+            <div class="stats-grid">
+                <div class="stat-card fade-up delay-1 hover-lift">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <h3>Total Scanned</h3>
+                        <div class="stat-value" id="stat-total">0</div>
+                    </div>
+                </div>
+                <div class="stat-card fade-up delay-2 hover-lift">
+                    <div class="stat-icon green">♻️</div>
+                    <div class="stat-info">
+                        <h3>Recyclable</h3>
+                        <div class="stat-value text-success" id="stat-recyclable">0</div>
+                    </div>
+                </div>
+                <div class="stat-card fade-up delay-3 hover-lift">
+                    <div class="stat-icon red">🗑️</div>
+                    <div class="stat-info">
+                        <h3>Non-Recyclable</h3>
+                        <div class="stat-value text-danger" id="stat-non">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modern DataTable Container -->
+            <div class="table-container fade-up delay-3 scroll-reveal">
+                <div class="table-header">
+                    <h2>Recent Classification Logs</h2>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Log ID</th>
+                                <th>Category</th>
+                                <th>Quantity Submitted</th>
+                                <th>AI Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            {% for row in data %}
+                            <tr class="data-row">
+                                <td data-label="Log ID">#{{ row[0] }}</td>
+                                <td data-label="Category" class="col-category">
+                                    <span class="type-pill">{{ row[1] }}</span>
+                                </td>
+                                <td data-label="Quantity">{{ row[2] }} units</td>
+                                <td data-label="AI Status" class="col-recyclable">{{ row[3] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if not data %}
+                <div class="empty-state">
+                    <p>No waste data has been logged yet.</p>
+                    <a href="{{ url_for('submit') }}">Log your first item</a>
+                </div>
+                {% endif %}
+            </div>
+
+        </main>
+    </div>
+</body>
+</html>

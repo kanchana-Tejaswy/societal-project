@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Waste Analytics | Welcome</title>
+
+    <!-- Clean External Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Native Static Connections -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <script defer src="{{ url_for('static', filename='landing.js') }}"></script>
+</head>
+
+<body class="landing-page">
+
+    <!-- Application Navigation Bar -->
+    <nav class="navbar">
+        <a href="{{ url_for('home') }}" class="nav-brand">
+            <span class="icon">♻️</span> SmartWaste
+        </a>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}" class="nav-item active">Home</a>
+            <a href="{{ url_for('submit') }}" class="nav-item">Log Waste</a>
+            <a href="{{ url_for('dashboard') }}" class="nav-item">Dashboard</a>
+        </div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-drawer" id="mobileDrawer">
+        <a href="{{ url_for('home') }}" class="nav-item active">Home</a>
+        <a href="{{ url_for('submit') }}" class="nav-item">Log Waste</a>
+        <a href="{{ url_for('dashboard') }}" class="nav-item">Dashboard</a>
+    </div>
+
+    <!-- Dedicated Hero Section Content -->
+    <main class="hero-section">
+        <div class="hero-content">
+            <h1 class="fade-in">
+                Plastic Waste Traking <span class="gradient-text">Recycling System</span>
+            </h1>
+            <p class="fade-in delay-1">
+                Empowering communities with machine learning intelligence. Scan, classify, and track recyclable plastic
+                waste across a seamless digital ecosystem to build a greener world.
+            </p>
+            <div class="cta-actions fade-in delay-2">
+                <a href="{{ url_for('submit') }}" class="btn btn-primary ripple-btn">Submit Waste Data</a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary ripple-btn">Open Dashboard</a>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>

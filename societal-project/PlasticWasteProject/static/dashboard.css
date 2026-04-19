@@ -1,9 +1,10 @@
 /* ============================================================
-   GLOBAL VARIABLES & THEME SETTINGS
+   GLOBAL VARIABLES & THEME SETTINGS (LIGHT ECO)
    ============================================================ */
-   :root {
+:root {
     /* Eco SaaS Color Palette */
     --primary: #2e7d32;
+    --primary-hover: #1b5e20;
     --secondary: #43a047;
     --accent: #66bb6a;
     --dark: #1b1b1b;
@@ -32,7 +33,7 @@
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Inter', 'Poppins', sans-serif;
     background: linear-gradient(135deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 100%);
     color: var(--dark);
     min-height: 100vh;
@@ -172,7 +173,7 @@ body {
 }
 
 .btn-new {
-    background: linear-gradient(135deg, #205c23, #154518);
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
     color: white;
     text-decoration: none;
     padding: 12px 25px;
@@ -183,11 +184,25 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    border: none;
+    cursor: pointer;
 }
 
 .btn-new:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(46, 125, 50, 0.4);
+}
+
+/* Clear Data Button Specific */
+form .btn-new {
+    background: rgba(244, 67, 54, 0.15);
+    color: #c62828 !important;
+    border: 1px solid rgba(244, 67, 54, 0.3) !important;
+    box-shadow: none;
+}
+form .btn-new:hover {
+    background: rgba(244, 67, 54, 0.25);
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.2);
 }
 
 /* ============================================================
@@ -348,52 +363,6 @@ body {
     border-radius: 0 12px 12px 0; 
 }
 
-/* ============================================================
-   PILLS & BADGE SYSTEM
-   ============================================================ */
-.type-pill {
-    background: rgba(0,0,0,0.04);
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #444;
-}
-
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    border-radius: 30px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    animation: pulse-glow 2.5s infinite alternate;
-}
-
-@keyframes pulse-glow {
-    0% { box-shadow: 0 0 0 0 transparent; }
-    100% { box-shadow: 0 0 8px 1px rgba(76, 175, 80, 0.3); }
-}
-
-.badge-success { 
-    background: rgba(102, 187, 106, 0.15); 
-    color: #2e7d32; 
-    border: 1px solid rgba(102, 187, 106, 0.3); 
-}
-
-.badge-danger { 
-    background: rgba(239, 83, 80, 0.12); 
-    color: #c62828; 
-    border: 1px solid rgba(239, 83, 80, 0.2); 
-    animation-name: none; /* No pulse for errors typically */
-}
-
-/* Dot Pseudo Elements for Badges */
-.badge-success::before, .badge-danger::before { 
-    content: '●'; 
-    font-size: 1.1em; 
-}
 
 /* ============================================================
    EMPTY STATE & EXTRAS
@@ -493,5 +462,4 @@ body {
         text-transform: uppercase;
     }
     .modern-table tbody tr:hover { transform: translateY(-2px); }
-    .badge { padding: 6px 12px; font-size: 0.8rem;}
 }

@@ -8,23 +8,23 @@
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Relative Static Paths for direct HTML execution -->
-    <link rel="stylesheet" href="../static/index.css">
-    <script defer src="../static/index.js"></script>
+    <!-- Relative Static Paths for Flask execution -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <script defer src="{{ url_for('static', filename='index.js') }}"></script>
 </head>
 
 <body class="landing-page">
 
     <!-- NAVBAR -->
     <nav class="navbar">
-        <a href="landing.html" class="nav-brand">
+        <a href="/" class="nav-brand">
             <span class="icon">♻️</span> SmartWaste
         </a>
 
         <div class="nav-links">
-            <a href="landing.html" class="nav-item">Home</a>
-            <a href="index.html" class="nav-item active">Submit Waste</a>
-            <a href="dashboard.html" class="nav-item">Analytics</a>
+            <a href="/" class="nav-item">Home</a>
+            <a href="/submit" class="nav-item active">Submit Waste</a>
+            <a href="/dashboard" class="nav-item">Analytics</a>
         </div>
 
         <button class="mobile-menu-btn" id="mobileMenuBtn">
@@ -34,15 +34,15 @@
 
     <!-- MOBILE MENU -->
     <div class="mobile-drawer" id="mobileDrawer">
-        <a href="landing.html" class="nav-item">Home</a>
-        <a href="index.html" class="nav-item active">Submit Waste</a>
-        <a href="dashboard.html" class="nav-item">Analytics</a>
+        <a href="/" class="nav-item">Home</a>
+        <a href="/submit" class="nav-item active">Submit Waste</a>
+        <a href="/dashboard" class="nav-item">Analytics</a>
     </div>
 
     <!-- FORM SECTION -->
     <section class="submit-section" style="padding: 120px 20px; display:flex; justify-content:center; align-items:center; min-height:100vh;">
 
-        <form action="#" method="POST" enctype="multipart/form-data" id="wasteForm">
+        <form action="/add" method="POST" enctype="multipart/form-data" id="wasteForm">
 
             <h2>Analyze Waste</h2>
             <p>Upload waste details for AI classification</p>

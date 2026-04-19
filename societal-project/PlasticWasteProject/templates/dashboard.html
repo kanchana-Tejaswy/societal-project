@@ -10,10 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
     <!-- External CSS -->
-    <link rel="stylesheet" href="../static/dashboard.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     
     <!-- External JS -->
-    <script defer src="../static/dashboard.js"></script>
+    <script defer src="{{ url_for('static', filename='dashboard.js') }}"></script>
 </head>
 <body>
     <!-- Background Particles Layer -->
@@ -27,9 +27,9 @@
         <aside class="sidebar" id="sidebar">
             <div class="logo">♻️ SmartWaste</div>
             <nav class="sidebar-nav">
-                <a href="landing.html" class="nav-item">Home</a>
-                <a href="index.html" class="nav-item">Submit Waste</a>
-                <a href="dashboard.html" class="nav-item active">Analytics</a>
+                <a href="/" class="nav-item">Home</a>
+                <a href="/submit" class="nav-item">Submit Waste</a>
+                <a href="/dashboard" class="nav-item active">Analytics</a>
             </nav>
         </aside>
 
@@ -43,10 +43,10 @@
                     <p>Real-time ML classification metrics</p>
                 </div>
                 <div class="topbar-actions">
-                    
-                    <button id="clearData" type="button" class="btn-new" style="background: rgba(244, 67, 54, 0.15); border: 1px solid rgba(244, 67, 54, 0.3); color: #c62828; cursor: pointer; text-shadow: none; font-family: 'Roboto', sans-serif;">🗑️ Clear Data</button>
-                    
-                    <a href="index.html" class="btn-new">＋ Log New Item</a>
+                    <form action="/clear" method="POST" style="display:inline;">
+                        <button type="submit" class="btn-new">🗑️ Clear Data</button>
+                    </form>
+                    <a href="/submit" class="btn-new">＋ Log New Item</a>
                 </div>
             </header>
 
@@ -56,21 +56,21 @@
                     <div class="stat-icon">📦</div>
                     <div class="stat-info">
                         <h3>Total Scanned</h3>
-                        <div class="stat-value" id="stat-total">0</div>
+                        <div class="stat-value" id="stat-total">{{ total }}</div>
                     </div>
                 </div>
                 <div class="stat-card fade-up delay-2 hover-lift">
                     <div class="stat-icon green">♻️</div>
                     <div class="stat-info">
                         <h3>Recyclable</h3>
-                        <div class="stat-value text-success" id="stat-recyclable">0</div>
+                        <div class="stat-value text-success" id="stat-recyclable">{{ recyclable }}</div>
                     </div>
                 </div>
                 <div class="stat-card fade-up delay-3 hover-lift">
                     <div class="stat-icon red">🗑️</div>
                     <div class="stat-info">
                         <h3>Non-Recyclable</h3>
-                        <div class="stat-value text-danger" id="stat-non">0</div>
+                        <div class="stat-value text-danger" id="stat-non">{{ non_recyclable }}</div>
                     </div>
                 </div>
             </div>
@@ -91,14 +91,31 @@
                                 <th>AI Status</th>
                             </tr>
                         </thead>
-                        <tbody id="tableBody"></tbody>
+                        <tbody id="tableBody">
+                            {% for row in data %}
+                            <tr>
+                                <td>#{{ row[0] }}</td>
+                                <td><span class="type-pill">{{ row[1] }}</span></td>
+                                <td>{{ row[2] }} units</td>
+                                <td>
+                                    {% if 'Non-Recyclable' in row[3] %}
+                                        <span class="badge badge-danger">{{ row[3] }}</span>
+                                    {% else %}
+                                        <span class="badge badge-success">{{ row[3] }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
                     </table>
                 </div>
 
+                {% if total == 0 %}
                 <div class="empty-state" id="emptyState">
                     <p>No waste data has been logged yet.</p>
-                    <a href="index.html">Log your first item</a>
+                    <a href="/submit">Log your first item</a>
                 </div>
+                {% endif %}
             </div>
 
         </main>

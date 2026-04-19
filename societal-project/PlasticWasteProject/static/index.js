@@ -23,42 +23,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const form = document.getElementById('wasteForm');
-    if (!form) return;
-
-    const feedback = document.createElement('div');
-    feedback.className = 'form-feedback';
-    feedback.style.marginTop = '1rem';
-    feedback.style.fontSize = '0.95rem';
-    form.appendChild(feedback);
-
-    form.addEventListener('submit', event => {
-        event.preventDefault();
-
-        const plasticType = form.plastic_type.value;
-        const quantity = Number(form.quantity.value);
-        const imageSelected = form.image.files.length > 0;
-
-        if (!plasticType || !quantity || quantity < 1) {
-            feedback.textContent = 'Please select a plastic type and enter a quantity.';
-            feedback.style.color = '#f87171';
-            return;
-        }
-
-        const storedLogs = JSON.parse(localStorage.getItem('smartWasteLogs') || '[]');
-        const newLog = {
-            id: storedLogs.length + 1,
-            type: plasticType,
-            quantity,
-            result: imageSelected ? 'Yes (Image)' : 'No (No image)',
-            createdAt: new Date().toLocaleString()
-        };
-
-        storedLogs.unshift(newLog);
-        localStorage.setItem('smartWasteLogs', JSON.stringify(storedLogs));
-
-        feedback.textContent = 'Saved locally. Open dashboard.html to view the record.';
-        feedback.style.color = '#86efac';
-        form.reset();
-    });
 });

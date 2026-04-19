@@ -47,7 +47,10 @@ def submit():
 @app.route('/dashboard')
 def dashboard():
     data = get_all_waste()
-    return render_template("dashboard.html", data=data)
+    total = len(data)
+    recyclable = sum(1 for row in data if 'Recyclable' in str(row[3]) and 'Non-Recyclable' not in str(row[3]))
+    non_recyclable = total - recyclable
+    return render_template("dashboard.html", data=data, total=total, recyclable=recyclable, non_recyclable=non_recyclable)
 
 
 # -------------------------
@@ -61,10 +64,25 @@ def add_waste():
     image_file = request.files.get('image')
 
     prediction = plastic_type
-    result = "No"
+    # -------------------------
+    # STEP 1: FALLBACK ML MODEL (OPTIONAL)
+    # -------------------------
+    if model:
+        try:
+            mapping = {"PET": 0, "HDPE": 1, "PVC": 2}
+            encoded = mapping.get(plastic_type, 0)
+
+            pred = model.predict([[encoded, quantity]])
+
+            result = "Recyclable" if pred[0] == 1 else "Non-Recyclable"
+        except:
+            result = "Non-Recyclable (Error)"
+    else:
+        # Hardcoded fallback if no model exists
+        result = "Recyclable" if plastic_type in ["PET", "HDPE"] else "Non-Recyclable"
 
     # -------------------------
-    # STEP 1: CNN IMAGE PREDICTION (PRIMARY)
+    # STEP 2: CNN IMAGE PREDICTION (PRIMARY)
     # -------------------------
     if image_file and image_file.filename != "":
         # 2. RUN INTELLIGENCE 
@@ -78,23 +96,9 @@ def add_waste():
             if pred_class.lower() in ["glass", "metal", "paper", "plastic"]:
                 prediction = pred_class
                 if confidence > 70:
-                    result = f"Yes ({confidence:.1f}%)"
+                    result = f"Recyclable ({confidence:.1f}%)"
                 else:
-                    result = "No (Low Confidence)"
-
-    # -------------------------
-    # STEP 2: FALLBACK ML MODEL (OPTIONAL)
-    # -------------------------
-    elif model:
-        try:
-            mapping = {"PET": 0, "HDPE": 1, "PVC": 2}
-            encoded = mapping.get(plastic_type, 0)
-
-            pred = model.predict([[encoded, quantity]])
-
-            result = "Yes (ML)" if pred[0] == 1 else "No (ML)"
-        except:
-            result = "No (ML Error)"
+                    result = "Non-Recyclable (Low Confidence)"
 
     # -------------------------
     # SAVE TO DATABASE

@@ -18,6 +18,10 @@ from flask import Flask, render_template, request, redirect, Response, jsonify
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
+# Ensure Database Schema is initialized natively on startup securely.
+with app.app_context():
+    init_db()
+
 # ... (manual_model loading remains same)
 
 @app.route('/')
@@ -44,9 +48,15 @@ def add_waste():
         lat = request.form.get('latitude')
         lon = request.form.get('longitude')
         
-        # Convert lat/lon to float if present
-        lat = float(lat) if lat else None
-        lon = float(lon) if lon else None
+        # Convert lat/lon to float safely if present and not empty
+        def safe_float(val):
+            try:
+                return float(val) if val and str(val).strip() != "" else None
+            except:
+                return None
+
+        lat = safe_float(lat)
+        lon = safe_float(lon)
 
         image_file = request.files.get('image')
 

@@ -356,21 +356,24 @@ body.landing-page {
 
 @media (max-width: 768px) {
     .navbar { 
-        top: 0; left: 0; transform: none; 
-        width: 100%; border-radius: 0; 
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid var(--glass-border);
+        top: 1rem; left: 50%; transform: translateX(-50%); 
+        width: 92%; border-radius: 20px; 
+        padding: 0.8rem 1.2rem;
     }
-    .navbar:hover { width: 100%; }
+    .navbar:hover { width: 92%; }
     .nav-links { display: none; }
     .mobile-menu-btn { display: flex; }
     
-    .hero-section { padding: 140px 15px 60px; }
-    .hero-content h1 { font-size: 3rem; letter-spacing: -1.5px; }
-    .hero-content p { font-size: 1.1rem; margin-bottom: 30px; }
+    .hero-section { padding: 160px 20px 60px; }
+    .hero-content h1 { font-size: 2.8rem; letter-spacing: -1px; line-height: 1.1; margin-bottom: 25px; }
+    .hero-content p { font-size: 1rem; margin-bottom: 40px; line-height: 1.5; }
     
     .cta-actions { flex-direction: column; width: 100%; gap: 15px; }
-    .btn { width: 100%; padding: 18px; font-size: 1.1rem; }
+    .btn { width: 100%; padding: 18px 30px; font-size: 1.1rem; border-radius: 15px; }
+
+    .mobile-drawer {
+        padding: 100px 30px;
+    }
 }
 
 /* ============================================================

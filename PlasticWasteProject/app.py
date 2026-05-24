@@ -37,7 +37,39 @@ def dashboard():
     data = get_all_waste()
     iot_data = get_iot_status()
     leaderboard = get_leaderboard()
-    return render_template("dashboard.html", data=data, iot_data=iot_data, leaderboard=leaderboard)
+    
+    # Advanced KPI Calculations
+    total_scanned = len(data)
+    
+    # Aggregate quantities securely ensuring no negatives
+    total_quantity = sum(max(0, int(item['quantity'] if item['quantity'] else 0)) for item in data)
+    
+    recyclable_items = [item for item in data if "yes" in str(item['recyclable']).lower()]
+    recyclable_count = len(recyclable_items)
+    
+    # Let's say 1 unit = ~0.05kg of plastic
+    total_plastic_kg = total_quantity * 0.05 
+    
+    # 1 recyclable item saves roughly 0.12kg of CO2
+    carbon_saved = recyclable_count * 0.12 
+    
+    non_recyclable_count = total_scanned - recyclable_count
+    efficiency = (recyclable_count / total_scanned * 100) if total_scanned > 0 else 0
+    total_points = sum(max(0, int(item['points'] if item['points'] else 0)) for item in data)
+
+    kpis = {
+        "total_scanned": total_scanned,
+        "total_quantity": total_quantity,
+        "recyclable_count": recyclable_count,
+        "non_recyclable": non_recyclable_count,
+        "efficiency": round(efficiency, 1),
+        "total_kg": round(total_plastic_kg, 2),
+        "carbon_saved": round(carbon_saved, 2),
+        "total_points": total_points,
+        "ai_accuracy": 94.2 # Simulated baseline for UI
+    }
+    
+    return render_template("dashboard.html", data=data, iot_data=iot_data, leaderboard=leaderboard, kpis=kpis)
 
 @app.route('/add', methods=['POST'])
 def add_waste():

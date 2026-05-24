@@ -33,71 +33,60 @@ document.addEventListener('DOMContentLoaded', () => {
     ---------------------------------------------------- */
     const data = window.WasteDataPayload || [];
     
-    let materialCounts = { 'Plastic': 0, 'Paper': 0, 'Glass': 0, 'Metal': 0, 'Other': 0 };
-    
-    data.forEach(item => {
-        let type = String(item.material).toLowerCase();
-        let qty = parseInt(item.quantity) || 1;
+    if (data.length > 0) {
+        let materialCounts = { 'Plastic': 0, 'Paper': 0, 'Glass': 0, 'Metal': 0, 'Other': 0 };
         
-        if(type.includes('plastic') || type.includes('pet') || type.includes('hdpe')) materialCounts['Plastic'] += qty;
-        else if(type.includes('paper') || type.includes('cardboard')) materialCounts['Paper'] += qty;
-        else if(type.includes('glass')) materialCounts['Glass'] += qty;
-        else if(type.includes('metal') || type.includes('alum')) materialCounts['Metal'] += qty;
-        else materialCounts['Other'] += qty;
-    });
+        data.forEach(item => {
+            let type = String(item.material).toLowerCase();
+            let qty = parseInt(item.quantity) || 1;
+            
+            if(type.includes('plastic') || type.includes('pet') || type.includes('hdpe')) materialCounts['Plastic'] += qty;
+            else if(type.includes('paper') || type.includes('cardboard')) materialCounts['Paper'] += qty;
+            else if(type.includes('glass')) materialCounts['Glass'] += qty;
+            else if(type.includes('metal') || type.includes('alum')) materialCounts['Metal'] += qty;
+            else materialCounts['Other'] += qty;
+        });
 
-    /* ----------------------------------------------------
-       3. CHART.JS INTEGRATION (DOUGHNUT)
-    ---------------------------------------------------- */
-    const ctx = document.getElementById('distributionChart');
-    if (ctx) {
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Plastic', 'Paper', 'Glass', 'Metal', 'Other'],
-                datasets: [{
-                    data: [
-                        materialCounts['Plastic'], 
-                        materialCounts['Paper'], 
-                        materialCounts['Glass'], 
-                        materialCounts['Metal'], 
-                        materialCounts['Other']
-                    ],
-                    backgroundColor: [
-                        '#3b82f6', // Blue
-                        '#10b981', // Emerald
-                        '#8b5cf6', // Purple
-                        '#f59e0b', // Orange
-                        '#94a3b8'  // Gray
-                    ],
-                    borderWidth: 0,
-                    hoverOffset: 10
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '75%',
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            padding: 20,
-                            font: { family: 'Inter', size: 12, weight: '600' },
-                            usePointStyle: true,
-                            color: '#64748b'
+        /* ----------------------------------------------------
+           3. CHART.JS INTEGRATION (DOUGHNUT)
+        ---------------------------------------------------- */
+        const ctx = document.getElementById('distributionChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Plastic', 'Paper', 'Glass', 'Metal', 'Other'],
+                    datasets: [{
+                        data: [
+                            materialCounts['Plastic'], 
+                            materialCounts['Paper'], 
+                            materialCounts['Glass'], 
+                            materialCounts['Metal'], 
+                            materialCounts['Other']
+                        ],
+                        backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#94a3b8'],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 20,
+                                font: { family: 'Inter', size: 12, weight: '600' },
+                                usePointStyle: true,
+                                color: '#64748b'
+                            }
                         }
-                    },
-                    tooltip: {
-                        backgroundColor: '#0f172a',
-                        padding: 12,
-                        titleFont: { family: 'Inter', size: 14 },
-                        bodyFont: { family: 'Inter', size: 14 },
-                        cornerRadius: 8
                     }
                 }
-            }
-        });
+            });
+        }
     }
 
     /* ----------------------------------------------------

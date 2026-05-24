@@ -3,69 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Waste | Analyze</title>
-    
-    <!-- Clean External Fonts -->
+    <title>AI Scanner Hub | SmartWaste</title>
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Native Static Connections (Allows VSCode Preview & Flask) -->
-    <link rel="manifest" href="/static/manifest.json">
+    <!-- External CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-    <script defer src="{{ url_for('static', filename='main.js') }}"></script>
-</head>
-<body class="landing-page">
     
-    <!-- Application Navigation Bar -->
-    <nav class="navbar">
-        <a href="{{ url_for('home') }}" class="nav-brand">
-            <span class="icon">♻️</span> SmartWaste
-        </a>
-        <div class="nav-links">
-            <a href="{{ url_for('home') }}" class="nav-item">Home</a>
-            <a href="{{ url_for('submit') }}" class="nav-item active">Log Waste</a>
-            <a href="{{ url_for('dashboard') }}" class="nav-item">Dashboard</a>
-        </div>
-        <button class="mobile-menu-btn" id="mobileMenuBtn">
-            <span></span><span></span><span></span>
-        </button>
-    </nav>
+    <!-- External JS -->
+    <script defer src="{{ url_for('static', filename='dashboard.js') }}"></script>
+</head>
+<body class="saas-dashboard">
 
-    <!-- Mobile Navigation Drawer -->
-    <div class="mobile-drawer" id="mobileDrawer">
-        <a href="{{ url_for('home') }}" class="nav-item">Home</a>
-        <a href="{{ url_for('submit') }}" class="nav-item active">Log Waste</a>
-        <a href="{{ url_for('dashboard') }}" class="nav-item">Dashboard</a>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="dashboard-layout">
+        
+        <!-- ================= SIDEBAR ================= -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <span class="brand-icon">🌿</span>
+                    <span class="brand-text">EcoNode OS</span>
+                </div>
+                <button class="mobile-close-btn" id="mobileCloseBtn">✕</button>
+            </div>
+
+            <div class="sidebar-nav">
+                <div class="nav-section">
+                    <p class="nav-section-title">Core Operations</p>
+                    <a href="{{ url_for('home') }}" class="nav-item">
+                        <span class="nav-icon">🌍</span>
+                        <span class="nav-label">Global Overview</span>
+                    </a>
+                    <a href="{{ url_for('submit') }}" class="nav-item active">
+                        <span class="nav-icon">📷</span>
+                        <span class="nav-label">AI Scanner Hub</span>
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="nav-item">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">Intelligence Panel</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <p class="nav-section-title">Government Integration</p>
+                    <a href="{{ url_for('gov_export_api') }}" target="_blank" class="nav-item">
+                        <span class="nav-icon">🏛️</span>
+                        <span class="nav-label">Live API Sync</span>
+                    </a>
+                    <a href="{{ url_for('download_data') }}" class="nav-item">
+                        <span class="nav-icon">📥</span>
+                        <span class="nav-label">Export CSV Records</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ================= MAIN CONTENT ================= -->
+        <main class="main-content">
+            
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <span></span><span></span><span></span>
+                    </button>
+                    <div>
+                        <h1 class="page-title">AI Scanner Hub</h1>
+                        <p class="page-subtitle">Real-time Material Classification & Ingest</p>
+                    </div>
+                </div>
+            </header>
+
+            <section class="scanner-container fade-up">
+                <div class="glass-panel scanner-card">
+                    <div class="panel-header">
+                        <h3>Citizen Ingest Portal</h3>
+                        <span class="badge">Neural Link Active</span>
+                    </div>
+                    
+                    <form action="{{ url_for('add_waste') }}" method="POST" enctype="multipart/form-data" id="wasteForm" class="enterprise-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Citizen ID / Operator</label>
+                                <input type="text" name="user_id" id="user_id" placeholder="ID-7729-NX" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Reported Type</label>
+                                <select name="plastic_type" id="plastic_type" required>
+                                    <option value="" disabled selected>Select category...</option>
+                                    <option value="PET">PET (Bottles)</option>
+                                    <option value="HDPE">HDPE (Rigid)</option>
+                                    <option value="PVC">PVC (Pipes)</option>
+                                    <option value="Paper">Paper / Fiber</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Quantity (Units)</label>
+                                <input type="number" name="quantity" id="quantity" value="1" min="1" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Neural Input (Image)</label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" name="image" id="image" required accept="image/*">
+                                    <div class="file-dummy">
+                                        <span class="icon">📁</span>
+                                        <span class="text">Click to upload material scan</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-enterprise primary large" id="submitBtn">
+                            <span>Execute AI Classification</span>
+                            <span class="btn-icon">⚡</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="scanner-sidebar">
+                    <div class="glass-panel tip-card">
+                        <h4>💡 Pro Tip</h4>
+                        <p>High-contrast backgrounds improve AI confidence ratings. Ensure material is clearly visible in the frame.</p>
+                    </div>
+                    <div class="glass-panel status-card">
+                        <h4>📡 Network Status</h4>
+                        <ul class="status-list">
+                            <li><span class="dot online"></span> TensorFlow v2.x</li>
+                            <li><span class="dot online"></span> MobileNetV2</li>
+                            <li><span class="dot online"></span> GPS Geolocation</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+        </main>
     </div>
-
-    <!-- Strictly Submit Form Logic inside Index -->
-    <section class="submit-section">
-        <form action="{{ url_for('add_waste') }}" method="POST" enctype="multipart/form-data" id="wasteForm" class="fade-in delay-1">
-            <h2>Citizen Portal</h2>
-            <p>Input waste details to run AI classification and earn rewards.</p>
-            
-            <label>Citizen ID / Name</label>
-            <input type="text" name="user_id" id="user_id" placeholder="Enter your unique ID" required>
-
-            <label>Plastic Type</label>
-            <select name="plastic_type" id="plastic_type" required>
-                <option value="" disabled selected>Select Plastic Type...</option>
-                <option value="PET">PET (Bottles, Containers)</option>
-                <option value="HDPE">HDPE (Milk Jugs, Detergent)</option>
-                <option value="PVC">PVC (Pipes, Medical Tubes)</option>
-            </select>
-            
-            <label>Quantity Metric</label>
-            <input type="number" name="quantity" id="quantity" placeholder="Units / Pieces" required min="1">
-            
-            <label>Upload Material Image</label>
-            <input type="file" name="image" id="image" required accept="image/*">
-            
-            <!-- Submit Action -->
-            <button type="submit" class="btn-submit" id="submitBtn">
-                <span class="btn-text">Run Intelligence ♻️</span>
-            </button>
-        </form>
-    </section>
 
 </body>
 </html>

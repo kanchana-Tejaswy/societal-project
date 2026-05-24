@@ -66,34 +66,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleMenu = (btn, target, className = 'open') => {
         if (!btn || !target) return;
         
+        const updateHamburger = (isOpen) => {
+            const spans = btn.querySelectorAll('span');
+            if (spans.length === 3) {
+                spans[0].style.transform = isOpen ? 'translateY(8px) rotate(45deg)' : 'none';
+                spans[1].style.opacity = isOpen ? '0' : '1';
+                spans[2].style.transform = isOpen ? 'translateY(-8px) rotate(-45deg)' : 'none';
+            }
+        };
+
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const isOpen = target.classList.toggle(className);
-            
-            // Handle Hamburger Animation if spans exist
-            const spans = btn.querySelectorAll('span');
-            if (spans.length === 3) {
-                spans[0].style.transform = isOpen ? 'translateY(10px) rotate(45deg)' : 'none';
-                spans[1].style.opacity = isOpen ? '0' : '1';
-                spans[2].style.transform = isOpen ? 'translateY(-10px) rotate(-45deg)' : 'none';
-            } else if (btn.id === 'menuToggle') {
-                // For Dashboard simple toggle
-                btn.innerHTML = isOpen ? '✕' : '☰';
-            }
+            updateHamburger(isOpen);
+        });
+
+        // Close when clicking links
+        target.querySelectorAll('.nav-item').forEach(link => {
+            link.addEventListener('click', () => {
+                target.classList.remove(className);
+                updateHamburger(false);
+            });
         });
 
         // Close when clicking outside
         document.addEventListener('click', (e) => {
             if (target.classList.contains(className) && !target.contains(e.target) && !btn.contains(e.target)) {
                 target.classList.remove(className);
-                const spans = btn.querySelectorAll('span');
-                if (spans.length === 3) {
-                    spans[0].style.transform = 'none';
-                    spans[1].style.opacity = '1';
-                    spans[2].style.transform = 'none';
-                } else if (btn.id === 'menuToggle') {
-                    btn.innerHTML = '☰';
-                }
+                updateHamburger(false);
             }
         });
     };

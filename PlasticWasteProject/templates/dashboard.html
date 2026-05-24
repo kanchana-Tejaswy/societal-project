@@ -8,17 +8,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- External CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     
     <!-- External JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script defer src="{{ url_for('static', filename='dashboard.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='main.js') }}"></script>
 </head>
 <body>
     <!-- Background Particles Layer -->
     <div id="particles"></div>
 
     <!-- Toggle Btn for Mobile Sidebar -->
-    <button class="mobile-menu-btn" id="menuToggle">☰</button>
+    <button class="mobile-menu-btn" id="menuToggle">
+        <span></span><span></span><span></span>
+    </button>
 
     <div class="dashboard-wrapper">
         <!-- Sidebar Navigation -->
@@ -26,9 +32,26 @@
             <div class="logo">♻️ SmartWaste</div>
             <nav class="sidebar-nav">
                 <a href="{{ url_for('home') }}" class="nav-item">🏠 Home</a>
-                <a href="{{ url_for('submit') }}" class="nav-item">♻️ Submit Waste</a>
+                <a href="{{ url_for('submit') }}" class="nav-item">♻️ Citizen Portal</a>
                 <a href="{{ url_for('dashboard') }}" class="nav-item active">📊 Analytics</a>
+                <a href="{{ url_for('gov_export_api') }}" target="_blank" class="nav-item">🏛️ Gov API</a>
             </nav>
+
+            <!-- Rewards Leaderboard Section -->
+            <div class="leaderboard-section">
+                <h3>🏆 Leaderboard</h3>
+                <div class="leaderboard-list">
+                    {% for entry in leaderboard %}
+                    <div class="leader-item">
+                        <span class="leader-name">{{ entry[0] }}</span>
+                        <span class="leader-points">{{ entry[1] }} pts</span>
+                    </div>
+                    {% endfor %}
+                    {% if not leaderboard %}
+                    <p class="empty-text">No rewards yet.</p>
+                    {% endif %}
+                </div>
+            </div>
         </aside>
 
         <!-- Main Content Area -->
@@ -38,20 +61,15 @@
             <header class="topbar fade-up">
                 <div>
                     <h1>Waste Analytics</h1>
-                    <p>Real-time ML classification metrics</p>
+                    <p>Real-time ML classification & IoT metrics</p>
                 </div>
                 <div class="topbar-actions">
-                    <a href="{{ url_for('download_data') }}" class="btn-new" style="background: rgba(255, 255, 255, 0.4); border: 1px solid rgba(0,0,0,0.1); color: var(--dark); text-shadow: none;">⬇️ Download CSV</a>
-                    
-                    <form action="{{ url_for('clear_data') }}" method="POST" style="margin: 0;">
-                        <button type="submit" class="btn-new" style="background: rgba(244, 67, 54, 0.15); border: 1px solid rgba(244, 67, 54, 0.3); color: #c62828; cursor: pointer; text-shadow: none; font-family: 'Inter';" onclick="return confirm('Are you sure you want to clear all data? This cannot be undone.');">🗑️ Clear Data</button>
-                    </form>
-                    
+                    <a href="{{ url_for('download_data') }}" class="btn-new">⬇️ Download CSV</a>
                     <a href="{{ url_for('submit') }}" class="btn-new">＋ Log New Item</a>
                 </div>
             </header>
 
-            <!-- Dashboard KPIs / Stat Cards -->
+            <!-- Dashboard KPIs -->
             <div class="stats-grid">
                 <div class="stat-card fade-up delay-1 hover-lift">
                     <div class="stat-icon">📦</div>
@@ -68,16 +86,55 @@
                     </div>
                 </div>
                 <div class="stat-card fade-up delay-3 hover-lift">
-                    <div class="stat-icon red">🗑️</div>
+                    <div class="stat-icon blue">🪙</div>
                     <div class="stat-info">
-                        <h3>Non-Recyclable</h3>
-                        <div class="stat-value text-danger" id="stat-non">0</div>
+                        <h3>Points Awarded</h3>
+                        <div class="stat-value text-primary" id="stat-points">0</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Modern DataTable Container -->
-            <div class="table-container fade-up delay-3 scroll-reveal">
+            <!-- Visualization Grid -->
+            <div class="viz-grid">
+                <!-- Advanced Charts -->
+                <div class="viz-card fade-up delay-1">
+                    <h3>Recycling Distribution</h3>
+                    <canvas id="wasteChart"></canvas>
+                </div>
+                <!-- GPS Waste Map -->
+                <div class="viz-card fade-up delay-2">
+                    <h3>GPS Waste Tracking</h3>
+                    <div id="wasteMap" style="height: 300px; border-radius: 20px;"></div>
+                </div>
+            </div>
+
+            <!-- IoT Smart Bin Status -->
+            <div class="table-container fade-up delay-3" style="margin-top: 40px;">
+                <div class="table-header">
+                    <h2>📡 IoT Smart Bin Integration</h2>
+                </div>
+                <div class="iot-grid">
+                    {% for bin in iot_data %}
+                    <div class="iot-card">
+                        <div class="bin-header">
+                            <span class="bin-icon">🗑️</span>
+                            <h4>Bin #{{ bin[0] }}</h4>
+                        </div>
+                        <p>{{ bin[1] }}</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill {% if bin[2] > 80 %}high{% elif bin[2] > 50 %}med{% endif %}" style="width: {{ bin[2] }}%;"></div>
+                        </div>
+                        <div class="bin-footer">
+                            <span>{{ bin[2] }}% Full</span>
+                            {% if bin[2] > 80 %}<span class="alert-pill">⚠️ COLLECT NOW</span>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Modern DataTable -->
+            <div class="table-container fade-up delay-3" style="margin-top: 40px;">
                 <div class="table-header">
                     <h2>Recent Classification Logs</h2>
                 </div>
@@ -88,8 +145,9 @@
                             <tr>
                                 <th>Log ID</th>
                                 <th>Category</th>
-                                <th>Quantity Submitted</th>
+                                <th>Quantity</th>
                                 <th>AI Status</th>
+                                <th>Timestamp</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
@@ -99,8 +157,9 @@
                                 <td data-label="Category" class="col-category">
                                     <span class="type-pill">{{ row[1] }}</span>
                                 </td>
-                                <td data-label="Quantity">{{ row[2] }} units</td>
+                                <td data-label="Quantity">{{ row[2] }} Units</td>
                                 <td data-label="AI Status" class="col-recyclable">{{ row[3] }}</td>
+                                <td data-label="Timestamp" class="col-time">{{ row[4] }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -108,9 +167,12 @@
                 </div>
 
                 {% if not data %}
-                <div class="empty-state">
-                    <p>No waste data has been logged yet.</p>
-                    <a href="{{ url_for('submit') }}">Log your first item</a>
+                <div class="empty-state fade-up delay-3">
+                    <span class="icon">🍃</span>
+                    <p>Your waste analytics forest is empty.</p>
+                    <a href="{{ url_for('submit') }}" class="btn-log">
+                        <span>＋ Log Your First Item</span>
+                    </a>
                 </div>
                 {% endif %}
             </div>

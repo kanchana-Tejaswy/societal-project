@@ -11,8 +11,9 @@
         rel="stylesheet">
 
     <!-- Native Static Connections -->
+    <link rel="manifest" href="/static/manifest.json">
     <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
-    <script defer src="{{ url_for('static', filename='landing.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='main.js') }}"></script>
 </head>
 
 <body class="landing-page">
@@ -43,7 +44,7 @@
     <main class="hero-section">
         <div class="hero-content">
             <h1 class="fade-in">
-                Plastic Waste Traking <span class="gradient-text">Recycling System</span>
+                Plastic Waste Tracking <span class="gradient-text">Recycling System</span>
             </h1>
             <p class="fade-in delay-1">
                 Empowering communities with machine learning intelligence. Scan, classify, and track recyclable plastic

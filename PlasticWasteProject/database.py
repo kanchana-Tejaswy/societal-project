@@ -11,10 +11,14 @@ logger = logging.getLogger(__name__)
 # 2. RENDER SAFE DATABASE PATH RESOLUTION
 # ----------------------------------------------------
 # On Render using Persistent disks, data is mapped to /data securely.
-# Fallback firmly to local execution space if /data explicitly does not exist natively.
+# On Vercel, the filesystem is read-only except for /tmp.
+# Fallback firmly to local execution space if no specific cloud environment is detected.
 if os.path.exists("/data"):
     DB_PATH = "/data/database.db"
     logger.info("Render Persistent Disk (/data) securely detected.")
+elif os.environ.get("VERCEL"):
+    DB_PATH = "/tmp/database.db"
+    logger.info("Vercel Serverless environment detected. Using /tmp for transient storage.")
 else:
     DB_PATH = os.path.join(os.getcwd(), "database.db")
     logger.info("Local Runtime Path securely triggered.")
@@ -43,15 +47,42 @@ def init_db():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+        
+        # Core Waste Table with GPS and User ID
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS waste (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 plastic_type TEXT NOT NULL,
                 quantity INTEGER NOT NULL,
                 recyclable TEXT NOT NULL,
+                latitude REAL,
+                longitude REAL,
+                user_id TEXT,
+                points INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+        
+        # Simulated IoT Bin Table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS iot_bins (
+                id INTEGER PRIMARY KEY,
+                location TEXT NOT NULL,
+                fill_level INTEGER DEFAULT 0,
+                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
+        # Seed bins if empty
+        cursor.execute("SELECT COUNT(*) FROM iot_bins")
+        if cursor.fetchone()[0] == 0:
+            bins = [
+                (1, 'Central Market', 45),
+                (2, 'City Park', 85),
+                (3, 'Tech Hub Entrance', 12)
+            ]
+            cursor.executemany("INSERT INTO iot_bins (id, location, fill_level) VALUES (?, ?, ?)", bins)
+            
         conn.commit()
         logger.info("Database Schema explicitly verified and securely initialized.")
     except Exception as e:
@@ -63,31 +94,29 @@ def init_db():
 # ----------------------------------------------------
 # 5. SAFE INSERT HOOK
 # ----------------------------------------------------
-def add_waste_log(plastic_type, quantity, recyclable):
+def add_waste_log(plastic_type, quantity, recyclable, lat=None, lon=None, user_id="Anonymous"):
     conn = None
     try:
-        # Type validation constraint layer natively isolating string injection bounds seamlessly safely natively dynamically
         qty_safe = int(quantity) if quantity is not None else 1
         plastic_safe = str(plastic_type) if plastic_type else "Unknown"
         recyc_safe = str(recyclable) if recyclable else "Unknown"
+        
+        # Logic for Rewards System: Award points for recyclable plastic
+        points = 0
+        if "yes" in recyc_safe.lower():
+            points = qty_safe * 10 
 
         conn = get_db_connection()
         cursor = conn.cursor()
         
         cursor.execute("""
-            INSERT INTO waste (plastic_type, quantity, recyclable) 
-            VALUES (?, ?, ?)
-        """, (plastic_safe, qty_safe, recyc_safe))
+            INSERT INTO waste (plastic_type, quantity, recyclable, latitude, longitude, user_id, points) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (plastic_safe, qty_safe, recyc_safe, lat, lon, user_id, points))
         
         conn.commit()
-        logger.info(f"Database Insert Successful: [{plastic_safe}] | Qty: {qty_safe} | Status: {recyc_safe}")
+        logger.info(f"Database Insert Successful: [{plastic_safe}] | Qty: {qty_safe} | Status: {recyc_safe} | Points: {points}")
         
-    except ValueError as ve:
-        logger.warning(f"Integrity Error Processing Entry Quantities: {ve}")
-    except sqlite3.Error as sqle:
-        if conn:
-            conn.rollback() 
-        logger.error(f"SQLite Transaction Abort Protocol Triggered: {sqle}")
     except Exception as e:
         if conn:
             conn.rollback()
@@ -105,18 +134,48 @@ def get_all_waste():
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT id, plastic_type, quantity, recyclable, created_at 
+            SELECT id, plastic_type, quantity, recyclable, latitude, longitude, user_id, points, created_at 
             FROM waste 
             ORDER BY id DESC
         """)
         data = cursor.fetchall()
         return data
-        
-    except sqlite3.Error as sqle:
-        logger.error(f"SQLite Read Extraction Engine Crash: {sqle}")
-        return []
     except Exception as e:
         logger.error(f"Database Extraction Route Failure: {e}")
+        return []
+    finally:
+        if conn:
+            conn.close()
+
+def get_iot_status():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, location, fill_level, last_updated FROM iot_bins")
+        return cursor.fetchall()
+    except Exception as e:
+        logger.error(f"IoT Data Extraction Error: {e}")
+        return []
+    finally:
+        if conn:
+            conn.close()
+
+def get_leaderboard():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT user_id, SUM(points) as total_points 
+            FROM waste 
+            GROUP BY user_id 
+            ORDER BY total_points DESC 
+            LIMIT 5
+        """)
+        return cursor.fetchall()
+    except Exception as e:
+        logger.error(f"Leaderboard Extraction Error: {e}")
         return []
     finally:
         if conn:

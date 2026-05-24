@@ -1,0 +1,9 @@
+__pycache__
+*.pyc
+.env
+.git
+.gemini
+database.db
+*.pkl.bak
+venv
+.venv
